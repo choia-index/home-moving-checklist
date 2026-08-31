@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>이사 체크리스트</title>
+<style>
+  :root{
+    --sys-font:-apple-system,BlinkMacSystemFont,"Helvetica Neue",Arial,sans-serif;
+    --paper:#F7F9FC;
+    --card:#FFFFFF;
+    --ink:#111111;
+    --ink-soft:#5F6675;
+    --blue:#0057FF;
+    --blue-bg:#E3ECFF;
+    --oat:#D9E0EC;
+    --done:#B4BCCA;
+  }
+
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{margin:0;background:var(--paper);}
+  .app{
+    font-family:var(--sys-font);
+    background:var(--paper);
+    color:var(--ink);
+    padding:0 16px;
+    max-width:520px;
+    margin:0 auto;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* header — editorial hero card */
+  .cover{
+    background:var(--card);
+    color:var(--ink);
+    border:1px solid var(--oat);
+    border-radius:10px;
+    padding:22px 20px 20px;
+    margin-bottom:16px;
+    position:relative;
+    overflow:hidden;
+  }
+  .cover-eyebrow{
+    font-size:13px;
+    font-weight:600;
+    color:var(--blue);
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+  }
+  .cover-title-row{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    gap:12px;
+    margin:8px 0 20px;
+  }
+  .cover-title{
+    font-weight:800;
+    font-size:30px;
+    letter-spacing:-0.03em;
+    line-height:1.15;
+    margin:0;
+    color:var(--ink);
+  }
+  .cover-stats{
+    display:flex;
+    align-items:flex-end;
+    gap:12px;
+    margin-bottom:12px;
+  }
+  .cover-pct{
+    font-weight:600;
+    font-size:30px;
+    letter-spacing:-0.03em;
+    color:var(--blue);
+    line-height:1.15;
+    font-variant-numeric:tabular-nums;
+    flex:0 0 auto;
+  }
+  .cover-bar-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .cover-sub{
+    font-size:15px;
+    font-weight:500;
+    color:var(--ink-soft);
+    white-space:nowrap;
+    flex:0 0 auto;
+    font-variant-numeric:tabular-nums;
+  }
+  .overall-bar{
+    flex:1 1 auto;
+    height:10px;
+    background:var(--blue-bg);
+    border-radius:4px;
+    overflow:hidden;
+  }
+  .overall-bar-fill{
+    height:100%;
+    background:var(--blue);
+    border-radius:4px;
+    transition:width 0.25s ease;
+  }
+
+  .timeline-note{
+    font-size:15px;
+    color:var(--ink-soft);
+    background:var(--card);
+    border:1px solid var(--oat);
+    border-radius:10px;
+    padding:14px 16px;
+    margin-bottom:16px;
+    line-height:1.6;
+  }
+  .timeline-note b{color:var(--ink);font-weight:600;}
+
+  details.phase{
+    background:var(--card);
+    border:1px solid var(--oat);
+    border-radius:10px;
+    margin-bottom:12px;
+    overflow:hidden;
+  }
+  details.phase[open]{ border-color:var(--blue); }
+
+  summary.phase-head{
+    list-style:none;
+    cursor:pointer;
+    padding:22px 20px;
+    display:flex;
+    align-items:center;
+    gap:14px;
+  }
+  summary.phase-head::-webkit-details-marker{ display:none; }
+  summary.phase-head:active{ background:var(--blue-bg); }
+
+  .tag{
+    font-size:13px;
+    font-weight:600;
+    color:var(--blue);
+    background:var(--blue-bg);
+    border-radius:4px;
+    padding:6px 4px;
+    width:88px;
+    text-align:center;
+    white-space:nowrap;
+    flex:0 0 auto;
+    letter-spacing:-0.01em;
+  }
+  .phase-title-wrap{ flex:1 1 auto; min-width:0; }
+  .phase-title{
+    font-weight:800;
+    font-size:17px;
+    letter-spacing:-0.02em;
+    color:var(--ink);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .phase-count{
+    font-size:14px;
+    color:var(--ink-soft);
+    margin-top:4px;
+    font-variant-numeric:tabular-nums;
+  }
+  .chev{
+    flex:0 0 auto;
+    color:var(--oat);
+    display:flex;
+    align-items:center;
+    transition:transform 0.2s ease;
+  }
+  details.phase[open] .chev{ transform:rotate(180deg); color:#9DB8F0; }
+
+  .phase-progress{
+    height:8px;
+    background:var(--blue-bg);
+    margin:0 20px;
+    border-radius:9999px;
+    overflow:hidden;
+  }
+  .phase-progress-fill{
+    height:100%;
+    background:var(--blue);
+    border-radius:9999px;
+    transition:width 0.25s ease;
+  }
+
+  .phase-body{
+    padding:2px 20px 12px;
+  }
+
+  .cat-name{
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:0.02em;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    margin:32px 0 8px 2px;
+  }
+  .cat-name:first-of-type{ margin-top:14px; }
+
+  label.item{
+    display:flex;
+    align-items:flex-start;
+    gap:11px;
+    padding:11px 2px;
+    font-size:16px;
+    font-weight:600;
+    letter-spacing:-0.01em;
+    line-height:1.45;
+    cursor:pointer;
+    border-bottom:1px solid var(--oat);
+    color:var(--ink);
+  }
+  label.item:last-child{ border-bottom:none; }
+  label.item:active{ opacity:0.6; }
+
+  input.chk{
+    appearance:none;
+    -webkit-appearance:none;
+    width:20px;height:20px;
+    flex:0 0 auto;
+    margin-top:0px;
+    border-radius:4px;
+    border:1.5px solid var(--oat);
+    background:var(--card);
+    position:relative;
+    cursor:pointer;
+    transition:background 0.15s ease, border-color 0.15s ease;
+  }
+  input.chk:checked{
+    background:var(--blue);
+    border-color:var(--blue);
+  }
+  input.chk:checked::after{
+    content:"";
+    position:absolute;
+    left:6px; top:2px;
+    width:5px; height:10px;
+    border:solid white;
+    border-width:0 2px 2px 0;
+    transform:rotate(45deg);
+  }
+  span.item-text{ flex:1 1 auto; word-break:keep-all; padding-top:1px; }
+  label.item.done span.item-text{
+    color:var(--done);
+    text-decoration:line-through;
+  }
+
+  .toolbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin:20px 4px 10px;
+  }
+  .toolbar button{
+    font-family:var(--sys-font);
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink);
+    background:var(--card);
+    border:1px solid var(--oat);
+    border-radius:4px;
+    padding:10px 16px;
+    cursor:pointer;
+    transition:transform 0.15s ease;
+  }
+  .toolbar button:active{ transform:scale(0.96); }
+
+  .footer-space{ height:10px; }
+
+  .ref-block{
+    background:var(--card);
+    border:1px solid var(--oat);
+    border-radius:10px;
+    padding:16px 16px;
+    margin-bottom:24px;
+  }
+  .ref-title{
+    font-weight:600;
+    font-size:16px;
+    letter-spacing:-0.02em;
+    color:var(--ink);
+    margin-bottom:10px;
+  }
+  .ref-row{
+    font-size:16px;
+    letter-spacing:-0.01em;
+    color:var(--ink-soft);
+    padding:12px 0;
+    border-bottom:1px solid var(--oat);
+    line-height:1.5;
+  }
+  .ref-row b{ color:var(--blue); font-weight:600; display:block; margin-bottom:4px; }
+  .ref-detail{ display:block; font-weight:400; }
+  .ref-row:last-child{ border-bottom:none; }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <div class="cover">
+    <div class="cover-eyebrow">2026년 yea 세번째집</div>
+    <div class="cover-title-row">
+      <div class="cover-title">이사 체크리스트</div>
+      <div class="cover-pct" id="overallPct">0%</div>
+    </div>
+    <div class="cover-bar-row">
+      <div class="overall-bar"><div class="overall-bar-fill" id="overallBarFill" style="width:0%"></div></div>
+    </div>
+  </div>
+
+  <div class="timeline-note">
+    <b>9/30</b> 기존 집 퇴거·보관이사 시작 → <b>10/1</b> 새집 잔금·소유권 이전 → <b>10/2</b> 인테리어 시작 → <b>11/5</b> 인테리어 완료(예정) → <b>11/6~</b> 하자보수 → 입주청소 → 보관짐 반입 + 실제 입주
+  </div>
+
+  <div id="phaseList"></div>
+
+  <div class="toolbar">
+    <span id="syncStatus" style="font-size:12px;color:var(--ink-soft);">연결 중...</span>
+    <button id="resetBtn" type="button">전체 초기화</button>
+  </div>
+
+  <div class="ref-block">
+    <div class="ref-title">📋 끝까지 별도로 관리할 리스트 (참고)</div>
+    <div class="ref-row"><b>인테리어 추가비용</b><span class="ref-detail">날짜·항목·요청내용·추가금·승인여부·지급여부</span></div>
+    <div class="ref-row"><b>인테리어 자재</b><span class="ref-detail">공간·항목·브랜드·모델명·색상·가격·발주·시공여부</span></div>
+    <div class="ref-row"><b>인테리어 하자</b><span class="ref-detail">번호·공간·위치·문제·사진·접수일·보수예정일·완료여부</span></div>
+    <div class="ref-row"><b>가구·가전</b><span class="ref-detail">제품·브랜드·모델명·사이즈·구매금액·주문일·배송일·설치일</span></div>
+    <div class="ref-row"><b>이사비용</b><span class="ref-detail">보관이사비·보관료·사다리차·엘리베이터·폐기비·추가비용·최종결제금액</span></div>
+    <div class="ref-row"><b>이사 총비용</b><span class="ref-detail">취득세·법무사비·중개보수·이사비·보관료·인테리어비·가구비·가전비·입주청소비·기타</span></div>
+  </div>
+
+  <div class="footer-space"></div>
+</div>
+
+<script>
+const PHASES = [
+{tag:"9/1 – 9/6", title:"전체 일정·업체 계약 확정", cats:[
+  {name:"보관이사", items:["보관이사 업체 최종 선정","9/30 기존 집 짐 반출일 확정","이사 시작시간 확정","예상 짐량 전달","사다리차 필요 여부 확인","기존 집 엘리베이터 사용 가능 여부 확인","엘리베이터 사용료 확인","주차공간 확보 여부 확인","보관 방식 확인 (실내창고 / 컨테이너)","보관 장소 확인","온도 관리 여부 확인","습도 관리 여부 확인","CCTV 여부 확인","침수 대비 여부 확인","화재보험 여부 확인","도난 보상 여부 확인","파손 보상 기준 확인","반출 운송비 확인","보관료 확인","재반입 운송비 확인","사다리차 비용 확인","추가 인건비 발생 조건 확인","주말/공휴일 추가비용 확인","보관기간 연장 시 비용 확인","보관 중 일부 짐 출고 가능 여부 확인","예상 재반입일 업체에 전달","인테리어 지연 시 재반입일 변경 가능 여부 확인","계약서 및 견적서 보관"]},
+  {name:"기존 집 관리사무소", items:["9/30 퇴거 일정 신고","9/30 이사 엘리베이터 예약","이사 가능시간 확인","엘리베이터 보양 필요 여부 확인","사다리차 사용 가능 여부 확인","이사차량 주차 위치 확인","관리비 정산 방법 확인","선수관리비 정산 여부 확인","출입카드/주차카드 반납 방법 확인"]},
+  {name:"인테리어 업체", items:["인테리어 계약 완료","공사기간 10/2~11/5 계약서에 명시","전체 공정표 받기","최종 견적서 받기","계약금 확인","중도금 지급일 확인","잔금 지급일 확인","하자보수 전 잔금 지급 여부 확인","하자보수 기간 확인","철거비 포함 여부 확인","폐기물 처리비 포함 여부 확인","양중비 포함 여부 확인","엘리베이터 보양비 부담주체 확인","공사 중 추가비용 발생 기준 확인","추가공사는 사전 승인 후 진행하기로 합의","추가금은 문자/문서로 남기기로 하기","공사 배상책임보험 여부 확인"]},
+  {name:"새집 관리사무소", items:["10/2 인테리어 시작일 전달","인테리어 공사신고 방법 확인","공사 신청서 준비","주민동의 필요 여부 확인","공사보증금 확인","엘리베이터 보양 신청","보양비 확인","공사 가능시간 확인","소음공사 가능시간 확인","주말 공사 가능 여부 확인","철거폐기물 반출 규정 확인","공사업체 차량등록 방법 확인","공사 종료 후 보증금 반환조건 확인"]}
+]},
+{tag:"9/7 – 9/13", title:"인테리어 최종 결정", cats:[
+  {name:"전체 레이아웃", items:["최종 평면도 확인","철거할 벽/구조 확인","유지할 부분 표시","각 방 용도 확정","가구 배치 확정","주요 가구 실측","주요 가전 실측","실측값 인테리어 업체 전달"]},
+  {name:"전기·콘센트", items:["전체 콘센트 위치 확정","콘센트 개수 확인","침대 양쪽 콘센트","소파 주변 콘센트","TV 콘센트","TV 인터넷/LAN","공유기 위치","로봇청소기 위치","무선청소기 충전 위치","식탁 주변 콘센트","화장대 콘센트","욕실 콘센트","냉장고 콘센트","김치냉장고 콘센트","식기세척기 콘센트","인덕션 전원","오븐 콘센트","전자레인지 콘센트","밥솥 콘센트","정수기 콘센트","음식물처리기 콘센트","커피머신 등 소형가전 콘센트","USB / USB-C 콘센트 필요 여부 결정"]},
+  {name:"조명", items:["거실 메인조명","거실 간접조명","주방조명","식탁조명","침실조명","각 방 조명","현관 센서등","복도조명","욕실조명","간접조명 위치","스위치 위치","조명 색온도 결정"]},
+  {name:"주방", items:["냉장고 크기","김치냉장고 크기","식기세척기","인덕션","오븐","전자레인지","밥솥","정수기","음식물처리기","커피머신","주방 상판 결정","싱크볼 결정","수전 결정","주방 수납 구성 결정","소형가전 수납 위치 확인"]},
+  {name:"욕실", items:["타일","세면대","수전","변기","샤워기","욕실장","거울","휴지걸이","수건걸이","환풍기","콘센트","배수구"]},
+  {name:"마감재", items:["벽지","바닥재","타일","필름","도장 색상","문 색상","문손잡이","걸레받이"]},
+  {name:"가구", items:["침대 크기","소파 크기","식탁 크기","TV 크기","책상 크기","붙박이장 구성","기타 수납장"]}
+]},
+{tag:"9/14 – 9/20", title:"잔금·대출·등기 준비", cats:[
+  {name:"주택담보대출", items:["은행 담당자 연락처 저장","10/1 대출 실행 가능 여부 재확인","대출 승인 상태 확인","대출 실행금액 확인","금리 확인","대출기간 확인","상환방식 확인","중도상환수수료 확인","추가 제출서류 여부 확인","인지세 등 부대비용 확인","근저당 설정비용 확인","은행 지정 법무사 여부 확인","대출금이 어느 계좌로 지급되는지 확인"]},
+  {name:"잔금", items:["매매계약서 잔금일 10/1 재확인","중개사에게 잔금 절차 확인","잔금 필요금액 계산","대출 실행액 제외 직접 준비할 금액 계산","취득세 예상액 계산","법무사 비용 확인","중개보수 확인","인테리어 중도금 확보","보관이사 비용 확보","비상자금 별도 확보"]},
+  {name:"등기", items:["법무사 배정 확인","법무사 연락처 저장","소유권이전등기 필요서류 확인","근저당 설정 절차 확인","매도인 근저당 여부 확인","기존 근저당 말소 방법 확인"]}
+]},
+{tag:"9/14 – 9/23", title:"버리기·중고판매·짐 줄이기", cats:[
+  {name:"", items:["새집에 가져갈 가구 결정","버릴 가구 결정","가져갈 가전 결정","폐기할 가전 결정","중고판매 물품 등록","나눔 물품 정리","대형폐기물 목록 작성","대형폐기물 배출 신청","폐가전 무료수거 알아보기/예약","옷 정리","신발 정리","가방 정리","책 정리","서류 정리","화장품 정리","욕실용품 정리","주방용품 정리","팬트리 정리","오래된 식품 폐기","냉동식품 소진 시작","화분 이동/처분 결정","세탁소 맡긴 옷 찾아오기","수선 맡긴 물건 찾아오기"]}
+]},
+{tag:"9/21 – 9/27", title:"보관이사 본격 준비", cats:[
+  {name:"보관짐", items:["방별 라벨 체계 정하기 (예: 거실-01, 주방-01, 안방-01)","박스 번호별 내용 기록할 메모 만들기","고가 가구 사진 촬영","주요 가전 사진 촬영","가구 분해 전 상태 촬영","TV 전용포장 요청","모니터 전용포장 요청","유리제품 별도포장 요청","액자/그림 별도포장 요청","깨지기 쉬운 제품 표시"]},
+  {name:"5주 생활짐", items:["속옷","잠옷","출근복","일상복","운동복","신발","가방","10월용 옷","11월 초용 옷","니트","두꺼운 외투","세면도구","화장품","드라이기","수건","필요한 침구","휴대폰 충전기","노트북 충전기","태블릿 충전기","멀티탭","자주 사용하는 약","상비약","우산"]},
+  {name:"절대 보관하지 않을 것", items:["신분증","인감/도장","매매계약서","대출서류","법무사서류","통장","OTP","여권","현금","귀금속","노트북","태블릿","외장하드"]}
+]},
+{tag:"9/24 – 9/27", title:"이전·해지·주소 관련 예약", cats:[
+  {name:"", items:["기존 집 도시가스 전출 신청","인터넷 이전/해지 일정 확인","TV 이전 일정 확인","정수기 이전 일정 확인","비데 이전 여부 확인","에어컨 이전/철거 여부 확인","새집 인터넷 설치시기 결정","새집 도시가스 전입시기 결정","새 가전 설치일 계획","커튼/블라인드 실측·설치일 계획"]}
+]},
+{tag:"9/28 – 9/29", title:"이사·잔금 최종 점검", cats:[
+  {name:"잔금", items:["인터넷뱅킹 1일 이체한도 확인","1회 이체한도 확인","필요하면 이체한도 상향","은행에 10/1 대출 실행 최종 확인","대출 실행액 최종 확인","법무사 일정 최종 확인","중개사 잔금시간/장소 확인","잔금계좌 확인","직접 송금할 금액 다시 계산"]},
+  {name:"보관이사", items:["9/30 방문시간 최종 확인","이사업체 담당자 연락처 저장","엘리베이터 시간 재확인","이사차량 주차 확인","사다리차 확인","보관창고 입고 확인 방법 확인"]},
+  {name:"집", items:["냉장고 완전히 비우기","냉동실 비우기","세탁 완료","음식물쓰레기 처리","일반쓰레기 처리","재활용품 처리","대형폐기물 처리","5주 생활짐 별도 이동","10/1 잔금용 가방 별도 준비"]}
+]},
+{tag:"9/30", title:"기존 집 퇴거 + 보관이사", cats:[
+  {name:"반출 전", items:["집 전체 사진/영상 촬영","가구 상태 촬영","가전 상태 촬영","고가제품 촬영"]},
+  {name:"포장", items:["TV 포장 확인","모니터 포장 확인","유리제품 포장 확인","액자/그림 포장 확인","방별 라벨 확인","박스 수량 기록","가구 분해 상태 확인"]},
+  {name:"반출 후 집 확인", items:["모든 방","붙박이장","모든 서랍","싱크대","신발장","팬트리","베란다","다용도실","욕실장","창고","우편함"]},
+  {name:"정산", items:["관리비 정산","선수관리비 정산","전기 정산","수도 정산","도시가스 정산","관리사무소 퇴거 확인","열쇠/출입카드 등 인계"]},
+  {name:"보관", items:["보관창고 입고 확인","보관짐 수량 확인","보관짐 인수증 받기","퇴거 완료"]}
+]},
+{tag:"10/1", title:"새집 잔금 + 소유권 이전", cats:[
+  {name:"잔금 전", items:["신분증/계약서/필요서류 챙기기","최신 등기부등본 확인","권리관계 변동 여부 확인","은행 담당자 연락","법무사 연락","중개사 연락","잔금계좌 최종 확인"]},
+  {name:"잔금", items:["주택담보대출 실행 확인","대출금 지급 확인","나머지 잔금 송금","매도인 입금 확인","이체확인증 저장","기존 근저당 말소 진행 확인","소유권이전등기 접수 확인","취득세 처리 확인","법무사 접수증/영수증 보관"]},
+  {name:"새집 인수", items:["모든 열쇠 수령","공동현관 카드 수령","도어락 비밀번호 변경","관리사무소 인계사항 확인","집 전체 동영상 촬영","각 방 사진 (거실/주방/욕실/베란다/다용도실)","바닥·벽·천장·창호 기존 파손/하자 확인","수도·온수·보일러 확인","전기·콘센트·인터폰 확인","도어락·창문 확인","배수·누수 확인"]},
+  {name:"인테리어 현장 인계", items:["인테리어 업체에 열쇠/출입방법 전달","최종 도면 확인","최종 견적 확인","공정표 확인","철거범위 확인","철거하지 않을 곳 표시","보존할 시설 표시","공사신고 완료 확인","보양 확인","공사업체 차량등록 확인"]}
+]},
+{tag:"10/2 – 10/9", title:"철거·설비", cats:[
+  {name:"", items:["철거 시작 확인","철거범위 확인","철거 후 현장사진 촬영","누수 흔적 확인","곰팡이 확인","벽체 확인","바닥 확인","수도배관 확인","배수관 확인","예상하지 못한 문제 확인","추가공사 필요 여부 확인","추가비용 서면 확인","공정 지연 여부 확인"]}
+]},
+{tag:"10/10 – 10/18", title:"전기·설비·목공", cats:[
+  {name:"★ 벽/천장 닫기 전 사진 필수", items:["전기배선 사진","수도배관 사진","배수관 사진","에어컨배관 사진","인터넷/LAN 배선 사진","콘센트 위치","스위치 위치","조명 위치","천장 높이","커튼박스","붙박이장 자리","목공 치수","방별로 사진 정리"]}
+]},
+{tag:"10/19 – 10/27", title:"타일·필름·도장", cats:[
+  {name:"", items:["주문한 자재와 실제 자재 일치 확인","타일 색상","타일 깨짐","타일 단차","줄눈","필름 색상","필름 들뜸","필름 기포","도장 색상","도장 얼룩","문틀","걸레받이","실리콘 마감"]}
+]},
+{tag:"10/28 – 11/3", title:"도배·바닥·가구·전기 마감", cats:[
+  {name:"", items:["벽지 제품 확인","벽지 색상 확인","벽지 오염","벽지 들뜸","바닥재 확인","마루 찍힘","마루 들뜸","마루 스크래치","주방가구 설치","붙박이장 설치","문짝 정렬","서랍 작동","상판 상태","조명 설치","스위치 설치","콘센트 설치"]}
+]},
+{tag:"11/4 – 11/5", title:"인테리어 최종 하자검수", cats:[
+  {name:"벽/천장", items:["벽지 들뜸","벽지 찢김","오염","도장 얼룩","필름 들뜸"]},
+  {name:"바닥", items:["찍힘","스크래치","들뜸","걸레받이"]},
+  {name:"주방", items:["문짝 정렬","서랍","상판","수전","배수","누수"]},
+  {name:"욕실", items:["수압","온수","배수","변기","세면대","샤워기","환풍기","누수"]},
+  {name:"전기", items:["모든 콘센트 직접 테스트","모든 스위치 테스트","모든 조명 테스트","센서등 테스트","인터넷/LAN 확인"]},
+  {name:"문/창호", items:["방문","현관문","붙박이장","창문","잠금장치"]},
+  {name:"하자 기록", items:["하자에 마스킹테이프 부착","번호 부여","사진 촬영","하자리스트 작성","업체 전달","보수 예정일 확정"]}
+]},
+{tag:"11/6~", title:"하자보수", cats:[
+  {name:"", items:["하자보수 진행","항목별 완료 확인","완료사진 촬영","미처리 항목 재요청","공사 폐기물 완전 반출","최종 공사비 정산"]}
+]},
+{tag:"하자보수 후", title:"입주청소", cats:[
+  {name:"", items:["창문","창틀","바닥","벽 공사분진","붙박이장 내부","싱크대 내부","주방 후드","욕실","배수구","환풍구","조명","콘센트/스위치","문틀","걸레받이","공사분진 제거 확인","청소 완료 후 전체 검수","집 전체 사진 촬영"]}
+]},
+{tag:"입주청소 후", title:"보관짐 재반입 + 실제 입주", cats:[
+  {name:"", items:["보관이사업체 재반입일 확정","관리사무소 이사 예약","엘리베이터 예약","이사차량 주차 확인","바닥/벽 모서리 보양","보관짐 수량 확인","박스 수량 확인","가구 파손 확인","가전 파손 확인","방별 라벨에 맞춰 배치","가구 조립","가구 배치","이사업체 철수 전 전체 파손 확인"]}
+]},
+{tag:"입주 전후", title:"가전·생활설비", cats:[
+  {name:"", items:["냉장고","김치냉장고","세탁기","건조기","TV","식기세척기","정수기","에어컨","인터넷","IPTV","도시가스","커튼/블라인드"]}
+]},
+{tag:"입주 후", title:"주소·행정", cats:[
+  {name:"", items:["전입신고","우편물 주소 이전","은행 주소","카드사 주소","보험 주소","증권사 주소","회사 등록주소","쇼핑몰 기본배송지","정기배송 주소","자동차 관련 주소 확인","자동차보험 주소 확인","관리사무소 입주자 등록","차량 등록","공동현관 등록","출입카드 확인"]}
+]}
+];
+
+const STORAGE_KEY = 'moving-checklist-state-v1';
+let state = {};
+
+function allItemIds(){
+  const ids = [];
+  PHASES.forEach((p,pi)=>p.cats.forEach((c,ci)=>c.items.forEach((_,ii)=>ids.push(`p${pi}-c${ci}-i${ii}`))));
+  return ids;
+}
+
+let phaseUpdaters = [];
+
+function render(){
+  const list = document.getElementById('phaseList');
+  list.innerHTML = '';
+  phaseUpdaters = [];
+  const allIds = allItemIds();
+  let overallDone = 0;
+
+  PHASES.forEach((phase,pi)=>{
+    const phaseIds = [];
+    phase.cats.forEach((c,ci)=>c.items.forEach((_,ii)=>phaseIds.push(`p${pi}-c${ci}-i${ii}`)));
+    const phaseDone = phaseIds.filter(id=>state[id]).length;
+    overallDone += phaseDone;
+    const pct = phaseIds.length ? Math.round(phaseDone/phaseIds.length*100) : 0;
+
+    const det = document.createElement('details');
+    det.className = 'phase';
+
+    const summary = document.createElement('summary');
+    summary.className = 'phase-head';
+    summary.innerHTML = `
+      <span class="tag">${phase.tag}</span>
+      <span class="phase-title-wrap">
+        <div class="phase-title">${phase.title}</div>
+        <div class="phase-count">${phaseDone} / ${phaseIds.length} 완료 · ${pct}%</div>
+      </span>
+      <span class="chev">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
+      </span>
+    `;
+    det.appendChild(summary);
+
+    const prog = document.createElement('div');
+    prog.className = 'phase-progress';
+    const progFill = document.createElement('div');
+    progFill.className = 'phase-progress-fill';
+    progFill.style.width = pct + '%';
+    prog.appendChild(progFill);
+    det.appendChild(prog);
+
+    const body = document.createElement('div');
+    body.className = 'phase-body';
+
+    phase.cats.forEach((cat,ci)=>{
+      if(cat.name){
+        const cn = document.createElement('div');
+        cn.className = 'cat-name';
+        cn.textContent = cat.name;
+        body.appendChild(cn);
+      }
+      cat.items.forEach((text,ii)=>{
+        const id = `p${pi}-c${ci}-i${ii}`;
+        const lab = document.createElement('label');
+        lab.className = 'item' + (state[id] ? ' done' : '');
+        lab.dataset.id = id;
+        lab.innerHTML = `<input type="checkbox" class="chk" ${state[id] ? 'checked' : ''}><span class="item-text">${text}</span>`;
+        const cb = lab.querySelector('input');
+        cb.addEventListener('change', ()=>{
+          state[id] = cb.checked;
+          lab.classList.toggle('done', cb.checked);
+          saveItem(id, cb.checked);
+          updateOverall();
+          updatePhaseHeader(det, phaseIds, summary, prog, progFill);
+        });
+        body.appendChild(lab);
+      });
+    });
+
+    det.appendChild(body);
+    list.appendChild(det);
+    phaseUpdaters.push(()=>updatePhaseHeader(det, phaseIds, summary, prog, progFill));
+  });
+
+  updateOverall();
+}
+
+function updatePhaseHeader(det, phaseIds, summary, prog, progFill){
+  const done = phaseIds.filter(id=>state[id]).length;
+  const pct = phaseIds.length ? Math.round(done/phaseIds.length*100) : 0;
+  summary.querySelector('.phase-count').textContent = `${done} / ${phaseIds.length} 완료 · ${pct}%`;
+  progFill.style.width = pct + '%';
+}
+
+function updateOverall(){
+  const allIds = allItemIds();
+  const done = allIds.filter(id=>state[id]).length;
+  const pct = allIds.length ? Math.round(done/allIds.length*100) : 0;
+  document.getElementById('overallPct').textContent = pct + '%';
+  document.getElementById('overallBarFill').style.width = pct + '%';
+}
+
+/* ===== Supabase 연동 ===== */
+const SUPABASE_URL = 'https://wqnzfovrejjtateecdba.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_cPEFjaCi6dy0tQRld2ylxw_lD33WmGL';
+
+const HEADERS = {
+  'apikey': SUPABASE_KEY,
+  'Authorization': 'Bearer ' + SUPABASE_KEY,
+  'Content-Type': 'application/json'
+};
+
+async function load(){
+  render();
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/checklist?select=id,checked`, { headers: HEADERS });
+    if(!res.ok) throw new Error('load failed: ' + res.status);
+    const rows = await res.json();
+    state = {};
+    rows.forEach(r=>{ if(r.checked) state[r.id] = true; });
+    render();
+  }catch(e){
+    console.error('불러오기 실패', e);
+    setStatus('연결 실패 — 새로고침 해보세요', true);
+  }
+}
+
+async function saveItem(id, checked){
+  try{
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/checklist`, {
+      method: 'POST',
+      headers: { ...HEADERS, 'Prefer': 'resolution=merge-duplicates' },
+      body: JSON.stringify({ id, checked, updated_at: new Date().toISOString() })
+    });
+    if(!res.ok) throw new Error('save failed: ' + res.status);
+  }catch(e){
+    console.error('저장 실패', e);
+    setStatus('저장 실패 — 인터넷 연결을 확인하세요', true);
+  }
+}
+
+function setStatus(msg, isError){
+  const el = document.getElementById('syncStatus');
+  if(!el) return;
+  el.textContent = msg;
+  el.style.color = isError ? '#D93025' : 'var(--ink-soft)';
+}
+
+/* 다른 사람이 체크한 내용을 실시간 반영 */
+function applyRemote(id, checked){
+  if(!!state[id] === !!checked) return;
+  state[id] = checked;
+  const lab = document.querySelector(`label.item[data-id="${id}"]`);
+  if(lab){
+    lab.classList.toggle('done', checked);
+    const cb = lab.querySelector('input');
+    if(cb) cb.checked = checked;
+  }
+  phaseUpdaters.forEach(fn=>fn());
+  updateOverall();
+}
+
+function connectRealtime(){
+  const wsUrl = SUPABASE_URL.replace('https://','wss://') + '/realtime/v1/websocket?apikey=' + SUPABASE_KEY + '&vsn=1.0.0';
+  let ws;
+  try{ ws = new WebSocket(wsUrl); }catch(e){ return; }
+  let hb;
+
+  ws.onopen = ()=>{
+    ws.send(JSON.stringify({
+      topic: 'realtime:public:checklist',
+      event: 'phx_join',
+      payload: { config: { postgres_changes: [{ event: '*', schema: 'public', table: 'checklist' }] } },
+      ref: '1'
+    }));
+    hb = setInterval(()=>{
+      ws.send(JSON.stringify({ topic:'phoenix', event:'heartbeat', payload:{}, ref:'hb' }));
+    }, 25000);
+    setStatus('실시간 동기화 중', false);
+  };
+
+  ws.onmessage = (evt)=>{
+    try{
+      const msg = JSON.parse(evt.data);
+      const rec = msg?.payload?.data?.record;
+      if(rec && rec.id) applyRemote(rec.id, !!rec.checked);
+    }catch(e){}
+  };
+
+  ws.onclose = ()=>{
+    clearInterval(hb);
+    setStatus('재연결 중...', false);
+    setTimeout(connectRealtime, 3000);
+  };
+  ws.onerror = ()=>{ try{ ws.close(); }catch(e){} };
+}
+
+/* 앱이 다시 보일 때 최신 상태 다시 불러오기 */
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState === 'visible') load();
+});
+
+document.getElementById('resetBtn').addEventListener('click', async ()=>{
+  if(!confirm('모든 체크 표시를 초기화할까요? 두 사람 모두에게 적용되며 되돌릴 수 없습니다.')) return;
+  try{
+    await fetch(`${SUPABASE_URL}/rest/v1/checklist?checked=eq.true`, {
+      method: 'PATCH',
+      headers: HEADERS,
+      body: JSON.stringify({ checked: false })
+    });
+  }catch(e){ console.error(e); }
+  state = {};
+  render();
+});
+
+load();
+connectRealtime();
+</script>
+</body>
+</html>
